@@ -1,61 +1,237 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium import webdriver
+from dotenv import load_dotenv
+from selenium.webdriver.chrome.options import Options
+import os
 
 
+screenshot_dir = r"C:\Users\fisca\OneDrive\Documentos\Projeto paineis\selenium-gclick-project\Imagens"
+
+if not os.path.exists(screenshot_dir):
+    os.makedirs(screenshot_dir)
+
+
+load_dotenv()
+
+DB_USER = os.getenv("DB_USER")
+DB_SENHA = os.getenv("DB_SENHA")
+
+
+# Configurações do Selenium
 
 def scrape_responsibles(driver):
-
-
-    driver.get("https://appp.gclick.com.br/relatorios/tarefas")  # URL do Gclick
-
-    wait = WebDriverWait(driver, 10)  # Configura espera dinâmica
-
-    # Clica no botão para abrir as opções de colunas
-    try:
-        button = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "mat-mdc-button-touch-target")))
-        button.click()
+    # URL da página de login
+    login_url = "https://appp.gclick.com.br/autenticacao"
+    try: 
+        driver.get(login_url)
+        print("Página de login acessada.")
     except Exception as e:
-        print(f"Erro ao clicar no botão: {e}")
+        print(f"Erro ao acessar a página de login: {e}")
         return []
 
-    # Seleciona a checkbox de "Responsável"
+
+    wait = WebDriverWait(driver, 60)
+
+    # Preenche campo de usuário
     try:
-        checkbox = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Responsável')]/preceding-sibling::mat-checkbox")))
-        checkbox.click()
+        username_field = wait.until(EC.presence_of_element_located((By.ID, "mat-input-0")))
+        username_field.send_keys(DB_USER)
+        print("Campo de usuário preenchido.")
     except Exception as e:
-        print(f"Erro ao selecionar a checkbox de 'Responsável': {e}")
+        print(f"Erro ao preencher o campo de usuário: {e}")
+        return []
+    
+    # Preenche campo de senha
+    try:
+        password_field = wait.until(EC.presence_of_element_located((By.ID, "mat-input-1")))
+        password_field.send_keys(DB_SENHA)
+        print("Campo de senha preenchido.")
+    except Exception as e:
+        print(f"Erro ao preencher o campo de senha: {e}")
         return []
 
-    # Clica no botão "Aplicar" para aplicar as configurações
+    # Clica no botão de login
     try:
-        save_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Aplicar')]")))
-        save_button.click()
+        login_button = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "submit-button")))
+        login_button.click()
+        print("Botão de login clicado.")
     except Exception as e:
-        print(f"Erro ao clicar no botão 'Salvar': {e}")
+        print(f"Erro ao clicar no botão de login: {e}")
+        return []
+    
+
+    #checar o login 
+    try: 
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "user-img-button")))
+        print("Login realizado com sucesso.")
+        driver.save_screenshot(os.path.join(screenshot_dir, "login_success.png"))
+    except Exception as e:
+        print(f"Erro ao realizar o login: {e}")
+        driver.save_screenshot(os.path.join(screenshot_dir, "erro_login.png"))
         return []
 
-    # Aguarda os elementos da tabela carregarem
-    try:
-        rows = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "mat-ripple mat-mdc-button-ripple")))  
+
+    #ir direto pra URL das tarefas 
+    try: 
+        tarefas_url = "https://appp.gclick.com.br/relatorios/tarefas"
+        driver.get(tarefas_url)
+        print("Pagina de tarefas acessada.")
+        driver.save_screenshot(os.path.join(screenshot_dir, "tarefas_page_accessed.png"))
     except Exception as e:
-        print(f"Erro ao carregar as linhas da tabela: {e}")
+        print(f"Erro ao acessar a página de tarefas: {e}")
+        driver.save_screenshot(os.path.join(screenshot_dir, "erro_tarefas_page.png"))
         return []
 
-    # Captura os dados da coluna "Responsáveis e Nome"
-    responsibles = []
-    for row in rows:
+
+    wait = WebDriverWait(driver, 60)
+
+    
+    #Colocar filtro de responsáveis
+    try:
+        botao_colunas = wait.until(EC.presence_of_element_located((By.XPATH, "//button[@mattooltip='Exibir/ocultar colunas']")))
+        # Faz scroll até o botão para garantir que está visível
+        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", botao_colunas)
+        # Aguarda até estar clicável
+        wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@mattooltip='Exibir/ocultar colunas']")))
+        botao_colunas.click()
+        print("Botão de colunas clicado.")
+        driver.save_screenshot(os.path.join(screenshot_dir, "botao_colunas_clicked.png"))
+
+    except Exception as e:
+        print(f"Erro ao clicar no filtro de responsáveis: {e}")
+        driver.save_screenshot(os.path.join(screenshot_dir, "erro_filtro_responsaveis.png"))
+        return []
+            
+    #Selecionando filtro de responsáveis
+    try:
+        responsaveis_label = WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//label[contains(text(), 'Responsáveis')]"))
+        )
+        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", responsaveis_label)
+
+        ActionChains(driver).move_to_element(responsaveis_label).click().perform()
+        print("Filtro 'Responsáveis' selecionado.")
+        driver.save_screenshot(os.path.join(screenshot_dir, "filtro_responsaveis_selecionado.png"))
+    except Exception as e:
+        print(f"Erro ao selecionar o filtro 'Responsáveis': {e}")
+        driver.save_screenshot(os.path.join(screenshot_dir, "erro_filtro_responsaveis_selecionar.png"))
+        return []
+
+
+
+
+
+    try:
+        wait = WebDriverWait(driver, 10)
+        botao_aplicar_menu = wait.until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "success-button"))
+        )
+        scrollable_menu = driver.find_element(By.ID, "mat-menu-panel-26")
+        driver.execute_script("arguments[0].scrollTop = arguments[1].offsetTop;", scrollable_menu, botao_aplicar_menu)
+        wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'success-button')]")))
+
+        # Aguarda overlay sumir completamente antes de clicar
+        import time
+        overlay_timeout = 10
+        overlay_gone = False
+        for _ in range(overlay_timeout * 2):  # tenta por até 10 segundos
+            overlays = driver.find_elements(By.CLASS_NAME, "cdk-overlay-backdrop")
+            if not overlays or all(not o.is_displayed() for o in overlays):
+                overlay_gone = True
+                break
+            time.sleep(0.5)
+        if not overlay_gone:
+            print("Overlay ainda presente após aguardar, tentando clicar mesmo assim.")
+
+        # Tenta clicar normalmente, se falhar tenta via JS
         try:
-            # Localiza o nome do responsável na linha
-            responsible_name = row.find_element(By.CSS_SELECTOR, "mat-sort-header-content ng-tns-c1137168538-63").text  # Substitua pelo seletor correto
-            
-            # Localiza o nome da tarefa ou outro dado relacionado na mesma linha
-            task_name = row.find_element(By.CSS_SELECTOR, "mat-sort-header-content ng-tns-c1137168538-45").text  # Substitua pelo seletor correto
-            
-            # Relaciona o responsável com o nome da tarefa
-            responsibles.append({"responsavel": responsible_name, "tarefa": task_name})
-        except Exception as e:
-            print(f"Erro ao capturar os dados da linha: {e}")
+            botao_aplicar = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CLASS_NAME, "success-button"))
+            )
 
-    return responsibles
+            # Força o clique via JavaScript
+            driver.execute_script("arguments[0].click();", botao_aplicar)
+
+            # Espera um tempo
+            time.sleep(8)
+               
+        except Exception:
+            driver.execute_script("arguments[0].click();", botao_aplicar_menu)
+
+        print("Botão 'Aplicar' do menu de filtros clicado com sucesso.")
+        driver.save_screenshot(os.path.join(screenshot_dir, "botao_aplicar_menu_filtros_clicked.png"))
+        # Aguarda até a coluna 'Responsáveis' estar visível na tabela
+        try:
+            responsaveis1 = WebDriverWait(driver, 60).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "mat-column-responsaveis"))
+            )
+            driver.execute_script("arguments[0].scrollLeft = arguments[0].scrollWidth", responsaveis1)
+            print("Coluna 'Responsáveis' detectada na tabela.")
+            driver.save_screenshot(os.path.join(screenshot_dir, "coluna_responsaveis_detectada.png"))
+        except Exception as e:
+            print(f"Coluna 'Responsáveis' não apareceu a tempo: {e}")
+            driver.save_screenshot(os.path.join(screenshot_dir, "erro_coluna_responsaveis_nao_apareceu.png"))
+            return []
+    except Exception as e:
+                print(f"Erro ao clicar no botão 'Aplicar' do menu de filtros: {e}")
+                driver.save_screenshot(os.path.join(screenshot_dir, "erro_botao_aplicar_menu_filtros.png"))
+
+    
+    wait = WebDriverWait(driver, 60)
+
+    #pegar as informações dos responsáveis (meta e nome do mesmo)
+    dados_responsaveis = []
+
+    while True:
+        print("Processando página atual...")
+
+        try: 
+            tbody = wait.until(EC.presence_of_element_located(
+                (By.XPATH, "//tbody[contains(@class, 'mdc-data-table__content')]")
+            ))
+
+            linhas = tbody.find_elements(By.TAG_NAME, "tr")
+            for linha in linhas:
+                try:
+                    td_meta = linha.find_element(By.CLASS_NAME, "mat-column-dmeta")
+                    td_responsavel = linha.find_element(By.CSS_SELECTOR, ".mat-column-responsaveis")
+                    driver.execute_script("arguments[0].scrollLeft = arguments[0].scrollWidth", td_responsavel)
+
+                    meta = td_meta.text.strip()
+                    responsavel = td_responsavel.text.strip()
+
+                    dados_responsaveis.append([meta, responsavel])
+                except Exception as e:
+                    print(f"Erro ao extrair dados da linha: {e}")
+                    continue
+
+        except Exception as e:
+            print(f"Erro ao processar a tabela: {e}")
+            driver.save_screenshot(os.path.join(screenshot_dir, "erro_processar_tabela.png"))
+            break
+
+        # Tenta avançar para a próxima página 
+        try: 
+            proximo_btn = driver.find_element(By.XPATH, "//button[@aria-label='Próxima página' and not(@disabled)]")
+            driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", proximo_btn)
+            time.sleep(1)  # dá tempo pro scroll
+            if not proximo_btn.is_enabled():
+                print("Botão 'Próxima página' desabilitado, não há mais páginas.")
+                break
+            proximo_btn.click()
+            time.sleep(6)  # Espera um pouco para a próxima página carregar
+        except Exception:
+            print("Não há mais páginas para avançar.")
+            break
+
+    print("Dados coletados:")
+    for meta, responsavel in dados_responsaveis:
+        print(f"Meta: {meta} | Responsável: {responsavel}")
+
+    return dados_responsaveis
+
+    
+

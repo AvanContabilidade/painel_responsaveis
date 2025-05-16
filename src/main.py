@@ -18,7 +18,15 @@ def main():
     chrome_options.binary_location = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 
     # Caminho absoluto para o chromedriver
-    chromedriver_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "chromedriver.exe"))
+    chromedriver_path = r"C:\Users\fisca\OneDrive\Documentos\Projeto paineis\selenium-gclick-project\chromedriver-win64\chromedriver.exe"
+    if not os.path.exists(chromedriver_path):
+        print(f"Erro: O chromedriver não foi encontrado no caminho especificado: {chromedriver_path}")
+        return
+    # Verifica se o chromedriver é executável
+    if not os.access(chromedriver_path, os.X_OK):
+        print(f"Erro: O chromedriver não é executável. Verifique as permissões do arquivo: {chromedriver_path}")
+        return
+    # Inicializa o serviço do ChromeDriver
     service = Service(chromedriver_path)
     # Inicializa o WebDriver
     driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -28,9 +36,7 @@ def main():
         responsibles = scrape_responsibles(driver)
 
         # Exibe os resultados
-        print("Responsáveis e Tarefas:")
-        for item in responsibles:
-            print(f"Responsável: {item['responsavel']}, Tarefa: {item['tarefa']}")
+       
     finally:
         driver.quit()
 
