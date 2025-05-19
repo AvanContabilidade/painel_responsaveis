@@ -1,3 +1,4 @@
+import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -125,41 +126,40 @@ def scrape_responsibles(driver):
 
 
     try:
-        wait = WebDriverWait(driver, 10)
-        botao_aplicar_menu = wait.until(
-            EC.element_to_be_clickable((By.CLASS_NAME, "success-button"))
+        # Aguarda todos os botões com a classe 'success-button'
+        botao_aplicar_menu = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "success-button"))
         )
-        scrollable_menu = driver.find_element(By.ID, "mat-menu-panel-26")
-        driver.execute_script("arguments[0].scrollTop = arguments[1].offsetTop;", scrollable_menu, botao_aplicar_menu)
-        wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'success-button')]")))
+        botoes_aplicar = driver.find_elements(By.CLASS_NAME, "success-button")
 
-        # Aguarda overlay sumir completamente antes de clicar
-        import time
-        overlay_timeout = 10
-        overlay_gone = False
-        for _ in range(overlay_timeout * 2):  # tenta por até 10 segundos
-            overlays = driver.find_elements(By.CLASS_NAME, "cdk-overlay-backdrop")
-            if not overlays or all(not o.is_displayed() for o in overlays):
-                overlay_gone = True
-                break
-            time.sleep(0.5)
-        if not overlay_gone:
-            print("Overlay ainda presente após aguardar, tentando clicar mesmo assim.")
+        # Garante que há pelo menos dois botões
+        if len(botoes_aplicar) >= 2:
+            segundo_botao = botoes_aplicar[1]
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", segundo_botao)
 
-        # Tenta clicar normalmente, se falhar tenta via JS
-        try:
-            botao_aplicar = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.CLASS_NAME, "success-button"))
-            )
+            # Aguarda overlay sumir novamente antes do clique (caso tenha reaparecido)
+            overlay_timeout = 10
+            overlay_gone = False
+            for _ in range(overlay_timeout * 2):
+                overlays = driver.find_elements(By.CLASS_NAME, "cdk-overlay-backdrop")
+                if not overlays or all(not o.is_displayed() for o in overlays):
+                    overlay_gone = True
+                    break
+                time.sleep(0.5)
 
-            # Força o clique via JavaScript
-            driver.execute_script("arguments[0].click();", botao_aplicar)
+            if not overlay_gone:
+                print("Overlay ainda presente após aguardar o segundo botão.")
 
-            # Espera um tempo
+            driver.execute_script("arguments[0].click();", segundo_botao)
             time.sleep(8)
+            print("Segundo botão 'Aplicar' clicado com sucesso.")
+            driver.save_screenshot(os.path.join(screenshot_dir, "segundo_botao_aplicar_clicked.png"))
+        else:
+            raise Exception("Não foi possível encontrar o segundo botão 'Aplicar'")
+
                
-        except Exception:
-            driver.execute_script("arguments[0].click();", botao_aplicar_menu)
+    except Exception:
+        driver.execute_script("arguments[0].click();", botao_aplicar_menu)
 
         print("Botão 'Aplicar' do menu de filtros clicado com sucesso.")
         driver.save_screenshot(os.path.join(screenshot_dir, "botao_aplicar_menu_filtros_clicked.png"))
@@ -181,6 +181,8 @@ def scrape_responsibles(driver):
 
     
     wait = WebDriverWait(driver, 60)
+
+
 
     #pegar as informações dos responsáveis (meta e nome do mesmo)
     dados_responsaveis = []
