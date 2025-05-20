@@ -236,4 +236,3 @@ def scrape_responsibles(driver):
     return dados_responsaveis
 
     
-
