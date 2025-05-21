@@ -179,10 +179,36 @@ def scrape_responsibles(driver):
                 print(f"Erro ao clicar no botão 'Aplicar' do menu de filtros: {e}")
                 driver.save_screenshot(os.path.join(screenshot_dir, "erro_botao_aplicar_menu_filtros.png"))
 
+
     
+    try:
+        box_itens = wait.until(EC.element_to_be_clickable(
+            (By.CLASS_NAME, "mat-mdc-select-trigger")
+        ))
+        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", box_itens)
+        time.sleep(0.5)
+        driver.save_screenshot(os.path.join(screenshot_dir, "box_itens_visivel.png"))
+        box_itens.click()
+        time.sleep(0.5)
+        driver.save_screenshot(os.path.join(screenshot_dir, "menu_itens_aberto.png"))
+        # Aguarda o menu abrir e a opção aparecer pelo texto
+        opcao_1000 = wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//span[contains(text(), '1000')]")
+        ))
+        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", opcao_1000)
+        time.sleep(0.2)
+        driver.save_screenshot(os.path.join(screenshot_dir, "opcao_1000_visivel.png"))
+        opcao_1000.click()
+        print("Selecionada a opção de mais itens por página.")
+        driver.save_screenshot(os.path.join(screenshot_dir, "opcao_1000_clicada.png"))
+        time.sleep(2)
+    except Exception as e:
+        print(f"Erro ao selecionar quantidade de itens por página: {e}")
+        driver.save_screenshot(os.path.join(screenshot_dir, "erro_selecionar_itens_pagina.png"))
+
+
+
     wait = WebDriverWait(driver, 60)
-
-
 
     #pegar as informações dos responsáveis (meta e nome do mesmo)
     dados_responsaveis = []
@@ -200,12 +226,14 @@ def scrape_responsibles(driver):
                 try:
                     td_meta = linha.find_element(By.CLASS_NAME, "mat-column-dmeta")
                     td_responsavel = linha.find_element(By.CSS_SELECTOR, ".mat-column-responsaveis")
+                    td_status = linha.find_element(By.CLASS_NAME, "mat-column-status")
                     driver.execute_script("arguments[0].scrollLeft = arguments[0].scrollWidth", td_responsavel)
 
                     meta = td_meta.text.strip()
                     responsavel = td_responsavel.text.strip()
+                    status = td_status.text.strip()
 
-                    dados_responsaveis.append([meta, responsavel])
+                    dados_responsaveis.append([meta, responsavel, status])
                 except Exception as e:
                     print(f"Erro ao extrair dados da linha: {e}")
                     continue
@@ -230,8 +258,8 @@ def scrape_responsibles(driver):
             break
 
     print("Dados coletados:")
-    for meta, responsavel in dados_responsaveis:
-        print(f"Meta: {meta} | Responsável: {responsavel}")
+    for meta, responsavel, status in dados_responsaveis:
+        print(f"Meta: {meta} | Responsável: {responsavel} | Status: {status}")
 
     return dados_responsaveis
 
