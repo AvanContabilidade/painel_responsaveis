@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from selenium.webdriver.chrome.options import Options
 import os
 
+print("Iniciando o processo de scraping do GClick...")
+
 
 screenshot_dir = r"C:\Users\fisca\OneDrive\Documentos\Projeto paineis\selenium-gclick-project\Imagens"
 
@@ -21,9 +23,12 @@ DB_USER = os.getenv("DB_USER")
 DB_SENHA = os.getenv("DB_SENHA")
 
 
+print("Variáveis de ambiente carregadas com sucesso.")
+
 # Configurações do Selenium
 
 def scrape_responsibles(driver):
+    print("Iniciando o processo de scraping...")
     # URL da página de login
     login_url = "https://appp.gclick.com.br/autenticacao"
     try: 
