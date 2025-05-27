@@ -44,39 +44,7 @@ def precisa_recoletar():
 cache_file = "dados_cache.parquet"
 
 
-def formatar_data(data_str):
-    if not data_str:
-        return "Última atualização: ainda não realizada"
-    try:
-        dt = datetime.fromisoformat(data_str)
-        return dt.strftime("Última atualização: %d/%m/%Y às %H:%M")
-    except Exception:
-        return "Última atualização: inválida"
 
-if os.path.exists(cache_time_file):
-    with open(cache_time_file, "r") as f:
-        ultima_atualizacao_str = f.read().strip()
-else:
-    ultima_atualizacao_str = None
-
-msg = formatar_data(ultima_atualizacao_str)
-
-st.markdown(
-    f"""
-    <div style='
-        position:fixed;
-        bottom: 10px;
-        right: 50px;
-        font-size: 14px;
-        color: white;
-        padding: 6px 12px
-        z-index: 9999;
-    '>
-        {msg}
-    </div>
-    """,
-    unsafe_allow_html=True
-)
 
 #recoletar = st.sidebar.button("🔄 Recoletar dados")
 
@@ -254,6 +222,42 @@ if 'df' in st.session_state:
 
 
 st.markdown("<br>", unsafe_allow_html=True)  # espaço antes dos botões
+
+
+def formatar_data(data_str):
+    if not data_str:
+        return "Última atualização: ainda não realizada"
+    try:
+        dt = datetime.fromisoformat(data_str)
+        return dt.strftime("Última atualização: %d/%m/%Y às %H:%M")
+    except Exception:
+        return "Última atualização: inválida"
+
+if os.path.exists(cache_time_file):
+    with open(cache_time_file, "r") as f:
+        ultima_atualizacao_str = f.read().strip()
+else:
+    ultima_atualizacao_str = None
+
+msg = formatar_data(ultima_atualizacao_str)
+
+
+
+st.markdown(
+    f"""
+    <div style='
+        margin-top: 40px;
+        margin-bottom: 0px;
+        color: #fff;
+        padding: 12px 20px;
+        font-size: 16px;
+        text-align: left;
+    '>
+        🕒 Última atualização: {msg}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 # Botões de navegação manual
 
 
@@ -269,6 +273,9 @@ if not st.session_state.user_navigated:
 else:
     # Após uma navegação manual, reseta a flag para que auto-carrossel continue depois
     st.session_state.user_navigated = False
+
+
+
 
 
 
