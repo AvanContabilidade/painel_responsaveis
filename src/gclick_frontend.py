@@ -14,10 +14,22 @@ import streamlit.components.v1 as components
 from datetime import datetime, timedelta
 import os
 
+st.set_page_config(layout="wide")
+st.markdown(
+    """
+    <style>
+        body, .stApp, .block-container, header, [data-testid="stHeader"] {
+            background-color: #f8f9fa !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 cache_file = "dados_cache.parquet"
 cache_time_file = "dados_cache_time.txt"
-horarios_recoleta = ["10:00", "12:00", "15:00", "01:00"]  
+horarios_recoleta = ["10:00", "12:09", "15:00", "01:00"]  
 
 def precisa_recoletar():
     agora = datetime.now()
@@ -178,8 +190,10 @@ if 'df' in st.session_state:
         fig.update_layout(
             showlegend=False,
             margin=dict(l=0, r=0, t=0, b=0),
-            width=300,
-            height=300
+            width=220,
+            height=220,
+            paper_bgcolor="#f8f9fa",   # <- fundo externo do gráfico
+            plot_bgcolor="#f8f9fa" 
         )
 
         if st_img_base64:
@@ -197,13 +211,12 @@ if 'df' in st.session_state:
                 st.markdown(f"""
                     <div style="  
                         border-radius: 16px;
-                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                        height: 180px;
+                        height: 130px;
                         padding: 20px;
                         margin-bottom: 5px;
                         text-align: center;
                     ">
-                        <h3 style="margin-bottom: 20px; font-size: 35px; color: white;">{responsavel}</h3>
+                        <h3 style="margin-bottom: 20px; font-size: 35px; color: #333 !important;">{responsavel}</h3>
                 """, unsafe_allow_html=True)
 
                 st.plotly_chart(fig, use_container_width=True)
@@ -248,7 +261,7 @@ st.markdown(
     <div style='
         margin-top: 40px;
         margin-bottom: 0px;
-        color: #fff;
+        color: #333 !important;
         padding: 12px 20px;
         font-size: 16px;
         text-align: left;
