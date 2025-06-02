@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from selenium.webdriver.chrome.options import Options
 import os
 
+
 print("Iniciando o processo de scraping do GClick...")
 
 
@@ -211,7 +212,7 @@ def scrape_responsibles(driver):
         print(f"Erro ao selecionar quantidade de itens por página: {e}")
         driver.save_screenshot(os.path.join(screenshot_dir, "erro_selecionar_itens_pagina.png"))
 
-
+#
 
     wait = WebDriverWait(driver, 60)
 
@@ -237,6 +238,13 @@ def scrape_responsibles(driver):
                     meta = td_meta.text.strip()
                     responsavel = td_responsavel.text.strip()
                     status = td_status.text.strip()
+
+                    with open ("responsaveis_desativados.json", encoding="utf-8") as f:
+                        responsaveis_desativados = json.load(f)
+
+                    if responsavel in responsaveis_desativados:
+                        print(f"Responsável '{responsavel}' está desativado, pulando...")
+                        continue
 
                     dados_responsaveis.append([meta, responsavel, status])
                 except Exception as e:
