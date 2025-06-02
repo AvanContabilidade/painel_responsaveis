@@ -229,7 +229,7 @@ def scrape_responsibles(driver):
             linhas = tbody.find_elements(By.TAG_NAME, "tr")
             for linha in linhas:
                 try:
-                    td_meta = linha.find_element(By.CLASS_NAME, "mat-column-dmeta")
+                    td_meta = linha.find_element(By.CLASS_NAME, "mat-column-dpainel")
                     td_responsavel = linha.find_element(By.CSS_SELECTOR, ".mat-column-responsaveis")
                     td_status = linha.find_element(By.CLASS_NAME, "mat-column-status")
                     driver.execute_script("arguments[0].scrollLeft = arguments[0].scrollWidth", td_responsavel)
