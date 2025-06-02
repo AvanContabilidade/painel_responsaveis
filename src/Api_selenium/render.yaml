@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: painel-api
+    env: python
+    plan: free
+    branch: main
+    region: oregon
+    workingDir: src/Api_selenium
+    startCommand: poetry run gunicorn api:app
