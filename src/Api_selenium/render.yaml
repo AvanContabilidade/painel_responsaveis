@@ -6,5 +6,6 @@ services:
       ./build.sh
     startCommand: |
       cd Api_selenium
-      poetry run gunicorn api:app
+      PORT=${PORT:-10000}
+      poetry run uvicorn api:app --host 0.0.0.0 --port $PORT
     workingDirectory: /opt/render/project/Api_selenium
