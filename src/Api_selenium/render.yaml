@@ -40,10 +40,8 @@ services:
       libxtst6 \
       lsb-release \
       wget \
-      xdg-utils
-      cd Api_selenium
+      xdg-utils && \
+      cd Api_selenium && \
       poetry install
     startCommand: |
-      cd Api_selenium
-      poetry run gunicorn api:app
-    
+      cd Api_selenium && poetry run gunicorn api:app
