@@ -6,6 +6,7 @@ authors = ["roberio5641 <escritorio@avancontabilidade.com.br>"]
 license = "MIT"
 readme = "README.md"
 keywords = ["selenium", "automation", "api"]
+packages = [{ include = "api" }]
 
 [tool.poetry.dependencies]
 python = ">=3.9"
@@ -26,3 +27,7 @@ flake8 = "^7.2.0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+# (opcional) Entry point
+[tool.poetry.scripts]
+start = "api:main"

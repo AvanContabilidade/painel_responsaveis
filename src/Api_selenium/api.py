@@ -7,7 +7,7 @@ from gclick_scraper import scrape_responsibles
 
 app = Flask(__name__)
 
-@app.route('/scrape', methods=['GET'])
+@app.route('/', methods=['GET'])
 def scrape():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
