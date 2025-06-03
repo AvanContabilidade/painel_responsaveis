@@ -13,7 +13,9 @@ def scrape():
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
-    
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--single-process")  # Importante para ambientes com poucos recursos
 
     system = platform.system()
 
@@ -21,8 +23,8 @@ def scrape():
         chrome_options.binary_location = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
         chromedriver_path = r"C:\Users\fisca\OneDrive\Documentos\Projeto paineis\selenium-gclick-project\chromedriver-win64\chromedriver.exe"
     else :
-        chrome_options.binary_location = "/usr/bin/google-chrome"
-        chromedriver_path = "/usr/local/bin/chromedriver"
+        chrome_options.binary_location = "/usr/bin/chromium-browser"  # Render usa Chromium
+        chromedriver_path = "/usr/bin/chromedriver"  # Caminho padrão no Render
         
     service = Service(executable_path=chromedriver_path)
     driver = webdriver.Chrome(service=service, options=chrome_options)
