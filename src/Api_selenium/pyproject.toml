@@ -1,4 +1,4 @@
-[project]
+[tool.poetry]
 name = "api-selenium"
 version = "0.1.0"
 description = "API para automação web com Selenium"
