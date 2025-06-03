@@ -21,7 +21,7 @@ def create_driver():
     chrome_options.add_argument("--disable-software-rasterizer")
     chrome_options.add_argument("--disable-extensions")
 
-    
+    chrome_options.binary_location = "/usr/bin/chromium-browser"    
     
     # Usa o webdriver-manager para gerenciar automaticamente o chromedriver
     try:
