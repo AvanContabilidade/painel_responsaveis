@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from gclick_scraper import scrape_responsibles
+from webdriver_manager.chrome import ChromeDriverManager
 
 app = FastAPI()
 
@@ -25,11 +26,12 @@ def scrape():
     if system == "Windows":
         chrome_options.binary_location = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
         chromedriver_path = r"C:\Users\fisca\OneDrive\Documentos\Projeto paineis\selenium-gclick-project\chromedriver-win64\chromedriver.exe"
+        service = Service(executable_path=chromedriver_path)
     else:
         chrome_options.binary_location = "/usr/bin/chromium-browser"
-        chromedriver_path = "/usr/bin/chromedriver"
+        service = ChromeDriverManager().install()
     
-    service = Service(executable_path=chromedriver_path)
+    
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
     try:
