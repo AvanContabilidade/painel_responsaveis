@@ -40,4 +40,5 @@ start = "api:main"  # Ponto de entrada opcional
 pytest = "^8.4.0"
 black = "^25.1.0"
 flake8 = "^7.2.0"
+uvicorn = "^0.34.3"
 
