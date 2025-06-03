@@ -13,13 +13,30 @@ import streamlit.components.v1 as components
 from datetime import datetime, timedelta
 import os
 
+
+def svg_to_base64(path):
+    with open(path, "r", encoding="utf-8") as svg_file:
+        svg_content = svg_file.read()
+        return base64.b64encode(svg_content.encode("utf-8")).decode()
+
+
+svg_path = os.path.join(os.path.dirname(__file__), "plano_de_fundo_for_B.I.svg")
+svg_base64 = svg_to_base64(svg_path)
+
+
 st.set_page_config(layout="wide")
 st.markdown(
-    """
+    f"""  
     <style>
-        body, .stApp, .block-container, header, [data-testid="stHeader"] {
+        body, .stApp, .block-container, header, [data-testid="stHeader"] {{
             background-color: #f8f9fa !important;
-        }
+        }}
+        .stApp {{
+        background-image: url("data:image/svg+xml;base64,{svg_base64}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }}
     </style>
     """,
     unsafe_allow_html=True
