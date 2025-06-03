@@ -26,12 +26,11 @@ def scrape():
     if system == "Windows":
         chrome_options.binary_location = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
         chromedriver_path = r"C:\Users\fisca\OneDrive\Documentos\Projeto paineis\selenium-gclick-project\chromedriver-win64\chromedriver.exe"
-        service = Service(executable_path=chromedriver_path)
     else:
-        chrome_options.binary_location = "/usr/bin/chromium-browser"
-        service = ChromeDriverManager().install()
+        chrome_options.binary_location = "/opt/chrome/chrome"
+        chromedriver_path = "/opt/chrome/chromedriver"
     
-    
+    service = Service(executable_path=chromedriver_path)
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
     try:
