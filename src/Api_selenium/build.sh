@@ -1,20 +1,23 @@
-#!/usr/bin/env bash
-pip install poetry
-poetry install
+#!/bin/bash
 
+# Instala dependências do sistema
+apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    libgbm-dev \
+    libxss1 \
+    libasound2 \
+    libnspr4 \
+    libnss3 \
+    fonts-liberation
 
-#instalação chrome
-
-# Instala o Chrome manualmente
+# Instala Chrome
 mkdir -p /opt/chrome
-curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o chrome.deb
-apt-get update && apt-get install -y ./chrome.deb
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O chrome.deb
+apt-get install -y ./chrome.deb
+rm chrome.deb
 ln -s /usr/bin/google-chrome /opt/chrome/chrome
 
-# Instala o ChromeDriver compatível
-CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
-CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
-curl -sSL "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -o chromedriver.zip
-unzip chromedriver.zip
-chmod +x chromedriver
-mv chromedriver /opt/chrome/chromedriver
+# Instala Poetry e dependências do projeto
+pip install poetry
+poetry install
