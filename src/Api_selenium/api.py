@@ -21,12 +21,13 @@ def create_driver():
     chrome_options.add_argument("--disable-software-rasterizer")
     chrome_options.add_argument("--disable-extensions")
 
-    driver.set_page_load_timeout(30)
+    
     
     # Usa o webdriver-manager para gerenciar automaticamente o chromedriver
     try:
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver.set_page_load_timeout(30)
         return driver
     except Exception as e:
         raise HTTPException(
@@ -59,3 +60,8 @@ def scrape():
     finally:
         if driver:
             driver.quit()
+
+
+@app.get("/")
+def read_root():
+    return JSONResponse(content={"message": "API de scraping do GClick está rodando! -> Use /scrape para coletar dados."})
