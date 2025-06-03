@@ -2,40 +2,27 @@
 name = "api-selenium"
 version = "0.1.0"
 description = "API para automação web com Selenium"
-authors = [
-    {name = "roberio5641", email = "escritorio@avancontabilidade.com.br"}
-]
+authors = ["roberio5641 <escritorio@avancontabilidade.com.br>"]
+license = "MIT"
 readme = "README.md"
-requires-python = ">=3.9"  # Versão mais compatível
-license = {text = "MIT"}  # Adicione uma licença
 keywords = ["selenium", "automation", "api"]
 
-dependencies = [
-    "selenium>=4.0.0",
-    "gunicorn>=23.0.0",
-    "flask>=2.0.0",  # Ou fastapi se preferir
-    "python-dotenv>=0.19.0",
-    "requests>=2.26.0",
-    "waitress (>=3.0.2,<4.0.0)",
-    "chromedriver-autoinstaller>=0.4.0",  # Novo
-    "webdriver-manager>=3.8.6"  # Alternativa melhor
-]
+[tool.poetry.dependencies]
+python = ">=3.9"
+selenium = "^4.0.0"
+gunicorn = "^23.0.0"
+flask = "^2.0.0"
+python-dotenv = "^0.19.0"
+requests = "^2.26.0"
+waitress = ">=3.0.2,<4.0.0"
+chromedriver-autoinstaller = "^0.4.0"
+webdriver-manager = "^3.8.6"
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=6.0.0",
-    "black>=22.0.0",
-    "flake8>=4.0.0"
-]
-
-[build-system]
-requires = ["poetry-core>=2.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-start = "api:main"  # Ponto de entrada opcional
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.0"
 black = "^25.1.0"
 flake8 = "^7.2.0"
 
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
