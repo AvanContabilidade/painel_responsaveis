@@ -3,6 +3,7 @@ services:
     name: painel-api
     runtime: python
     buildCommand: |
+      apt-get update && apt-get install -y chromium-browser chromium-chromedriver
       cd Api_selenium
       poetry install
     startCommand: |

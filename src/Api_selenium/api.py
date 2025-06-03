@@ -1,3 +1,4 @@
+import platform
 from flask import Flask, request, jsonify
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -12,11 +13,18 @@ def scrape():
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
-    chrome_options.binary_location = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+    
 
-    chromedriver_path = r"C:\Users\fisca\OneDrive\Documentos\Projeto paineis\selenium-gclick-project\chromedriver-win64\chromedriver.exe"
+    system = platform.system()
+
+    if system == "windows":
+        chrome_options.binary_location = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+        chromedriver_path = r"C:\Users\fisca\OneDrive\Documentos\Projeto paineis\selenium-gclick-project\chromedriver-win64\chromedriver.exe"
+    else :
+        chrome_options.binary_location = "/usr/bin/google-chrome"
+        chromedriver_path = "/usr/local/bin/chromedriver"
+        
     service = Service(executable_path=chromedriver_path)
-
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
     try: 
@@ -32,5 +40,3 @@ def scrape():
         return jsonify({"success": False, "message": str(e)}), 500
     
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
