@@ -13,30 +13,25 @@ app = FastAPI()
 
 def create_driver():
     chrome_options = Options()
-    chrome_options.binary_location = "/opt/chrome/chrome"  # Caminho correto do Chrome no Render
+    chrome_options.binary_location = "/opt/chrome/chrome"
 
+    # Adiciona ao PATH para que o Chrome seja encontrado
+    os.environ["PATH"] += os.pathsep + "/opt/chrome"
 
-    # Instala automaticamente o chromedriver compatível
     chromedriver_autoinstaller.install()
 
-    # Configurações necessárias para rodar no ambiente do Render
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920x1080")
-    chrome_options.add_argument("--disable-software-rasterizer")
-    chrome_options.add_argument("--disable-extensions")
 
     try:
         driver = webdriver.Chrome(options=chrome_options)
         driver.set_page_load_timeout(30)
         return driver
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Falha ao iniciar o ChromeDriver: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Falha ao iniciar o ChromeDriver: {str(e)}")
 
 
 @app.get("/scrape")
