@@ -3,16 +3,21 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+#from selenium.webdriver.chrome.service import Service
+#from webdriver_manager.chrome import ChromeDriverManager
 from gclick_scraper import scrape_responsibles
+import chromedriver_autoinstaller
 
 app = FastAPI()
 
 def create_driver():
     chrome_options = Options()
-    
-    # Configurações para rodar no Render.com
+    chrome_options.binary_location = "/opt/chrome/chrome"  # Caminho correto do Chrome no Render
+
+    # Instala automaticamente o chromedriver compatível
+    chromedriver_autoinstaller.install()
+
+    # Configurações necessárias para rodar no ambiente do Render
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
@@ -21,12 +26,8 @@ def create_driver():
     chrome_options.add_argument("--disable-software-rasterizer")
     chrome_options.add_argument("--disable-extensions")
 
-    chrome_options.binary_location = "/usr/bin/chromium-browser"    
-    
-    # Usa o webdriver-manager para gerenciar automaticamente o chromedriver
     try:
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver = webdriver.Chrome(options=chrome_options)
         driver.set_page_load_timeout(30)
         return driver
     except Exception as e:
@@ -34,6 +35,7 @@ def create_driver():
             status_code=500,
             detail=f"Falha ao iniciar o ChromeDriver: {str(e)}"
         )
+
 
 @app.get("/scrape")
 def scrape():
