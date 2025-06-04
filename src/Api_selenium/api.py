@@ -3,8 +3,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-#from selenium.webdriver.chrome.service import Service
-#from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from gclick_scraper import scrape_responsibles
 import chromedriver_autoinstaller
 import os 
@@ -12,26 +12,39 @@ import os
 app = FastAPI()
 
 def create_driver():
-  
-
     chrome_options = Options()
+    
+    # Configurações para rodar no Render.com
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920x1080")
-
-    chrome_options.binary_location = "/usr/bin/google-chrome"  # Common path on Linux   
-
-    # Auto-install ChromeDriver
-    chromedriver_autoinstaller.install()
-
+    chrome_options.add_argument("--disable-extensions")
+    
+    # Configurações específicas para o Chrome no Linux
+    chrome_options.add_argument('--disable-software-rasterizer')
+    chrome_options.add_argument('--remote-debugging-port=9222')
+    chrome_options.add_argument('--disable-setuid-sandbox')
+    
     try:
-        driver = webdriver.Chrome(options=chrome_options)
+        # Define o caminho correto para o Chrome
+        chrome_options.binary_location = "/usr/bin/google-chrome"  # Caminho padrão do Chrome no Linux
+        
+        # Configura o Service com opções adicionais
+        service = Service(
+            ChromeDriverManager().install(),
+            service_args=['--verbose']
+        )
+        
+        driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.set_page_load_timeout(30)
         return driver
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Falha ao iniciar o ChromeDriver: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Falha ao iniciar o ChromeDriver: {str(e)}"
+        )
 
 @app.get("/scrape")
 def scrape():

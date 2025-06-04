@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+# Instala dependências do sistema
 apt-get update && apt-get install -y \
     wget \
     unzip \
@@ -15,16 +16,18 @@ apt-get update && apt-get install -y \
     libx11-xcb1 \
     ca-certificates \
     gnupg \
-    curl
+    curl \
+    xvfb  # Adicionado X virtual framebuffer
 
-# Install Chrome
-wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-sudo apt-get update && sudo apt-get install -y google-chrome-stable
-which google-chrome 
+# Instala Chrome
+wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
+apt-get update && apt-get install -y google-chrome-stable
 
-# Instala Poetry e dependências
+# Verifica a instalação
+echo "Chrome instalado em: $(which google-chrome)"
+echo "Versão do Chrome: $(google-chrome --version)"
+
+# Instala Poetry e dependências do Python
 pip install poetry
 poetry install
-
-
