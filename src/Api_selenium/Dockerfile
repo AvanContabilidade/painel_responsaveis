@@ -1,42 +1,44 @@
-# Dockerfile para API FastAPI + Selenium + Chrome
 FROM python:3.11-slim
 
-# Evita prompts do apt
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Instala dependências do sistema e Chrome
+# Instala dependências do Chrome e Chromium
 RUN apt-get update && apt-get install -y \
-    wget unzip curl gnupg \
-    libglib2.0-0 libnss3 libgconf-2-4 libfontconfig1 libx11-xcb1 \
-    libxcomposite1 libxcursor1 libxdamage1 libxi6 libxtst6 libxrandr2 \
-    libasound2 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0 \
-    fonts-liberation libgbm-dev libxss1 \
-    && rm -rf /var/lib/apt/lists/*
+    wget \
+    gnupg \
+    curl \
+    ca-certificates \
+    fonts-liberation \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdbus-1-3 \
+    libdrm2 \
+    libgbm1 \
+    libnspr4 \
+    libnss3 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    xdg-utils \
+    --no-install-recommends
 
-# Instala o Google Chrome
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
-    && dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -fy \
-    && rm google-chrome-stable_current_amd64.deb
+# Instala o Google Chrome estável
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
+ && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+ && apt-get update && apt-get install -y google-chrome-stable
 
-# Define o caminho binário do Chrome
-ENV CHROME_BIN=/usr/bin/google-chrome
+# Verifica o caminho do chrome instalado (opcional)
+RUN ls -l /usr/bin/google-chrome
 
-# Define diretório de trabalho
+# Copia requirements e instala python libs
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia app
+COPY . /app
 WORKDIR /app
 
-# Copia arquivos do projeto
-COPY pyproject.toml poetry.lock.
+EXPOSE 10000
 
-# Instala o Poetry e dependências do projeto
-RUN pip install poetry && \
-    poetry config virtualenvs.create false && \
-    poetry install --no-root
-
-# Copia código-fonte restante
-COPY . .
-
-# Expõe a porta da aplicação
-EXPOSE 8000
-
-# Comando para iniciar a aplicação FastAPI
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "10000"]
