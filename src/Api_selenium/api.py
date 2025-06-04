@@ -29,7 +29,8 @@ def create_driver():
     
     try:
         # Define o caminho correto para o Chrome
-        chrome_options.binary_location = "/usr/bin/google-chrome"  # Caminho padrão do Chrome no Linux
+        chrome_options.binary_location = "/opt/render/project/.render/chrome/opt/google/chrome/google-chrome"
+  # Caminho padrão do Chrome no Linux
         
         # Configura o Service com opções adicionais
         service = Service(

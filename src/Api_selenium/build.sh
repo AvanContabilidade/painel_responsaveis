@@ -1,21 +1,39 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -o errexit
 
-# Instala dependências
+STORAGE_DIR="/opt/render/project/.render"
+CHROME_DIR="$STORAGE_DIR/chrome"
+CHROME_DEB="google-chrome-stable_current_amd64.deb"
+
+if [[ ! -d "$CHROME_DIR" ]]; then
+  echo "... Baixando o Chrome"
+  mkdir -p "$CHROME_DIR"
+  cd "$CHROME_DIR"
+  wget -q "https://dl.google.com/linux/direct/$CHROME_DEB"
+  dpkg -x "$CHROME_DEB" "$CHROME_DIR"
+  rm "$CHROME_DEB"
+else
+  echo "... Usando o Chrome a partir do cache"
+fi
+
+# Retorna ao diretório do projeto
+cd "$HOME/project/src"
+
+# Dependências do sistema necessárias para o Chrome rodar
 apt-get update && apt-get install -y \
-    wget curl gnupg unzip \
-    libgbm-dev libxss1 libasound2 libnspr4 libnss3 \
-    fonts-liberation libatk-bridge2.0-0 libgtk-3-0 libx11-xcb1
+    libgbm-dev \
+    libxss1 \
+    libasound2 \
+    libnspr4 \
+    libnss3 \
+    fonts-liberation \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    libx11-xcb1 \
+    ca-certificates \
+    curl \
+    unzip
 
-# Instala Chrome
-wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
-echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
-apt-get update && apt-get install -y google-chrome-stable
-
-# Verifica a instalação
-echo "Chrome instalado em: $(which google-chrome-stable)"
-echo "Versão do Chrome: $(google-chrome-stable --version)"
-
-# Instala dependências Python
-pip install poetry webdriver-manager
+# Instala Poetry e dependências do projeto
+pip install poetry
 poetry install
