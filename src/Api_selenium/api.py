@@ -12,7 +12,7 @@ import os
 app = FastAPI()
 
 def create_driver():
-    chrome_options.binary_location = "/usr/bin/google-chrome"  # Common path on Linux   
+  
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -20,6 +20,8 @@ def create_driver():
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920x1080")
+
+    chrome_options.binary_location = "/usr/bin/google-chrome"  # Common path on Linux   
 
     # Auto-install ChromeDriver
     chromedriver_autoinstaller.install()
