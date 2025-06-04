@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Instala dependências do sistema
 apt-get update && apt-get install -y \
     wget \
     unzip \
@@ -9,18 +8,21 @@ apt-get update && apt-get install -y \
     libasound2 \
     libnspr4 \
     libnss3 \
-    fonts-liberation
+    fonts-liberation \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    libx11-xcb1 \
+    ca-certificates \
+    gnupg \
+    curl
 
 # Instala Google Chrome
 mkdir -p /opt/chrome
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O chrome.deb
-apt-get install -y ./chrome.deb
+dpkg -i chrome.deb || apt-get install -fy
 rm chrome.deb
 ln -s /usr/bin/google-chrome /opt/chrome/chrome
 
-# Instala Poetry e dependências do projeto
+# Instala Poetry e dependências
 pip install poetry
 poetry install
-
-
-ln -s /usr/bin/google-chrome /opt/chrome/chrome
