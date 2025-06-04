@@ -7,12 +7,14 @@ from selenium.webdriver.chrome.options import Options
 #from webdriver_manager.chrome import ChromeDriverManager
 from gclick_scraper import scrape_responsibles
 import chromedriver_autoinstaller
+import os 
 
 app = FastAPI()
 
 def create_driver():
     chrome_options = Options()
     chrome_options.binary_location = "/opt/chrome/chrome"  # Caminho correto do Chrome no Render
+
 
     # Instala automaticamente o chromedriver compatível
     chromedriver_autoinstaller.install()
