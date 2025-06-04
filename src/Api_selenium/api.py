@@ -12,19 +12,17 @@ import os
 app = FastAPI()
 
 def create_driver():
+    chrome_options.binary_location = "/usr/bin/google-chrome"  # Common path on Linux   
+
     chrome_options = Options()
-    chrome_options.binary_location = "/opt/chrome/chrome"
-
-    # Adiciona ao PATH para que o Chrome seja encontrado
-    os.environ["PATH"] += os.pathsep + "/opt/chrome"
-
-    chromedriver_autoinstaller.install()
-
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920x1080")
+
+    # Auto-install ChromeDriver
+    chromedriver_autoinstaller.install()
 
     try:
         driver = webdriver.Chrome(options=chrome_options)
@@ -32,7 +30,6 @@ def create_driver():
         return driver
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Falha ao iniciar o ChromeDriver: {str(e)}")
-
 
 @app.get("/scrape")
 def scrape():

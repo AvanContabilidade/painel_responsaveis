@@ -17,13 +17,11 @@ apt-get update && apt-get install -y \
     gnupg \
     curl
 
-# Instala Google Chrome
-echo 'export PATH=$PATH:/opt/chrome' >> ~/.bashrc
-mkdir -p /opt/chrome
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O chrome.deb
-apt-get install -y ./chrome.deb || apt-get -f install -y
-rm chrome.deb
-ln -s /usr/bin/google-chrome /opt/chrome/chrome
+# Install Chrome
+wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+sudo apt-get update && sudo apt-get install -y google-chrome-stable
+which google-chrome 
 
 # Instala Poetry e dependências
 pip install poetry
